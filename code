@@ -1,0 +1,46 @@
+from machine import Pin
+import time
+
+blue_led = Pin(23, Pin.OUT);
+red_led = Pin(17, Pin.OUT);
+yellow_led = Pin(16, Pin.OUT);
+green_led = Pin(4, Pin.OUT);
+
+def TrafficLight():
+    green_led.on();
+    time.sleep(7);
+        
+    green_led.off();
+    for _ in range(3):
+        green_led.on();
+        time.sleep(1);
+            
+        green_led.off();
+        time.sleep(1);
+        
+    yellow_led.on();
+    time.sleep(5);
+    
+    blue_led.on();
+    red_led.on();
+    time.sleep(7);
+        
+    blue_led.off();
+    for _ in range(3):
+        blue_led.on();
+        red_led.off();
+        time.sleep(1);
+        
+        blue_led.off();
+        red_led.on();
+        time.sleep(1);
+    
+    red_led.off();
+    
+    
+def Program:
+    while(true):
+        TrafficLight();
+        
+
+Program();
