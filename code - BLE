@@ -1,0 +1,91 @@
+from machine import Pin
+import time
+
+from ubluetooth import BLE, UUID, FLAG_READ, FLAG_WRITE
+
+SERVICE_UUID = UUID(0x180F)
+CHARACTERISTIC_UUID = UUID(0x2A19)
+
+ble = BLE()
+
+gatt_service = ble.gatts_create_service(SERVICE_UUID)
+
+gatt_characteristic = gatt_service.add_characteristic(
+    CHARACTERISTIC_UUID,
+    properties=FLAG_READ | FLAG_WRITE,
+    value=bytes([0x00]),
+)
+
+adv_data = ble.gap_advertise(
+    100, 
+    adv_data=b'\x02\x01\x06\x06\x09\xFF\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+)
+
+print("Bluetooth Low Energy advertising started.")
+
+blue_led = Pin(23, Pin.OUT);
+red_led = Pin(17, Pin.OUT);
+yellow_led = Pin(16, Pin.OUT);
+green_led = Pin(4, Pin.OUT);
+
+def TrafficLight(isWorking):
+    while (isWorking):
+        green_led.on();
+        time.sleep(7);
+            
+        green_led.off();
+        for _ in range(3):
+            green_led.on();
+            time.sleep(1);
+                
+            green_led.off();
+            time.sleep(1);
+            
+        yellow_led.on();
+        time.sleep(5);
+        
+        yellow_led.off();
+        
+        blue_led.on();
+        red_led.on();
+        time.sleep(7);
+            
+        blue_led.off();
+        for _ in range(3):
+            blue_led.on();
+            red_led.off();
+            time.sleep(1);
+            
+            blue_led.off();
+            red_led.on();
+            time.sleep(1);
+        
+        red_led.off();
+    
+    green_led.off();
+    red_led.off();
+    yellow_led.off();
+    blue_led.off();
+    
+while True:
+    connected = ble.gap_connect(5000);
+    isWorking = false;
+    
+    if connected:  
+        while connected.isconnected():
+            data = ble.gatts_read(gatt_characteristic);
+            
+            if data:
+                command = received_data.decode('utf-8');
+                
+                print("Command is: ", command);
+                
+                if command == "run":
+                    print("The traffic light will start to operate!");
+                    isWorking = true;
+                elif command == "stop:
+                    print("The traffic light will stop!");
+                    isWorking = false;
+                    
+                    
+        TrafficLight(isWorking);
